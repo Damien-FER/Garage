@@ -86,7 +86,7 @@ details{margin-top:18px}summary{cursor:pointer;font-weight:600;min-height:44px;d
 .picb{display:block;width:100%;padding:0;border:0;background:none;margin:0 0 14px;cursor:zoom-in}
 .pic{display:block;width:100%;height:220px;object-fit:cover;border-radius:14px;background:var(--card);border:3px solid var(--blue);box-shadow:0 4px 0 var(--red)}
 .viewer{position:fixed;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(0,0,0,.92);padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom))}
-.viewer img{max-width:100%;min-height:0;flex:0 1 auto;max-height:calc(100% - 70px);object-fit:contain;border-radius:8px}
+
 .vbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.vbar .btn{display:inline-flex;align-items:center;cursor:pointer;background:#fff;color:#111;border-color:#fff}.vbar .danger{background:transparent;color:#ff8a65;border-color:#ff8a65}
 .vh label.addpic input,.vbar input{display:none}
 .banner.warn{background:var(--red);color:#fff}
@@ -97,6 +97,16 @@ details{margin-top:18px}summary{cursor:pointer;font-weight:600;min-height:44px;d
 .sheet>div{border-top:5px solid var(--blue)}
 .addpic{border-color:var(--blue-soft);color:var(--blue-ink)}
 .vh p a{color:var(--blue-ink)}
+.thw{position:relative;flex:none;display:block}.thw b{position:absolute;right:-7px;bottom:-7px;min-width:24px;height:24px;padding:0 5px;border-radius:999px;background:var(--blue);color:#fff;font-size:13px;display:grid;place-items:center;border:2px solid var(--card)}
+.strip{display:flex;gap:8px;overflow-x:auto;margin:-2px 0 14px;padding:2px 2px 6px}
+.sth{flex:none;width:64px;height:64px;padding:0;border-radius:10px;border:2px solid var(--blue-soft);background:var(--card);overflow:hidden;cursor:pointer}
+.sth img{width:100%;height:100%;object-fit:cover;display:block}.sth.on{border-color:var(--blue)}
+.sth.add{display:grid;place-items:center;font:700 30px/1 Barlow,sans-serif;color:var(--blue-ink);border-style:dashed}.sth.add input{display:none}
+.vimg{position:relative;display:flex;align-items:center;justify-content:center;min-height:0;max-width:100%;flex:0 1 auto}
+.vimg img{max-width:100%;max-height:calc(100vh - 190px);object-fit:contain;border-radius:8px;display:block}
+.nav{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:999px;border:0;background:rgba(0,0,0,.55);color:#fff;font:700 30px/1 Barlow,sans-serif;display:grid;place-items:center;padding-bottom:4px}
+.nav.prev{left:6px}.nav.next{right:6px}
+.vcount{color:#fff;font-size:14px;opacity:.85}
 </style></head><body><div id="root"></div><script src="config.js"></script><script type="application/json" id="data">{"demo":true,"v":[{"id":"d1","plaque":"GH-482-KL","client":"M. Benali","tel":"06 12 34 56 78","modele":"Peugeot 308 1.5 BlueHDi","km":"142000","up":"2026-11-24","items":[{"id":"a1","t":"Plaquettes AV (environ 3 mm)","u":"urgent","d":"2026-11-24","done":false},{"id":"a2","t":"Pneus AR à changer avant l’hiver","u":"bientot","d":"2026-11-24","done":false},{"id":"a3","t":"Vidange + filtre à huile","u":"surveiller","d":"2026-10-02","done":true,"dd":"2026-11-24"}]},{"id":"d2","plaque":"FN-117-PB","client":"Mme Lefèvre","tel":"07 81 22 40 19","modele":"Renault Clio IV 1.2","km":"98500","up":"2026-11-18","items":[{"id":"b1","t":"Batterie faible au test","u":"bientot","d":"2026-11-18","done":false},{"id":"b2","t":"Essuie-glaces","u":"surveiller","d":"2026-11-18","done":false}]},{"id":"d3","plaque":"DZ-655-RM","client":"M. Garnier","tel":"","modele":"Citroën Berlingo 1.6 HDi","km":"211300","up":"2026-11-10","items":[{"id":"c1","t":"Kit distribution (kilométrage atteint)","u":"urgent","d":"2026-11-10","done":false}]}]}</script><script id="app">{
 const KEY='carnet-atelier-v1';
 const CFG=window.FIREBASE_CONFIG;
@@ -124,7 +134,7 @@ const plain=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'
 const normPlate=p=>{const s=String(p||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(/^[A-Z]{2}\d{3}[A-Z]{2}$/.test(s))return s.slice(0,2)+'-'+s.slice(2,5)+'-'+s.slice(5);return String(p||'').toUpperCase().trim()};
 const ss=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k)||'';sessionStorage.setItem(k,v)}catch(e){return''}};
 const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k)||'';localStorage.setItem(k,v)}catch(e){return''}};
-const ui={q:ss('q'),f:'prevoir',u:'bientot',draft:ss('draft'),form:null,confirm:null,msg:null,viewer:null};
+const ui={q:ss('q'),f:'prevoir',u:'bientot',draft:ss('draft'),form:null,confirm:null,msg:null,viewer:null,delIdx:null};
 let dict=null,listening=false,status='';
 const pend=v=>v.items.filter(i=>!i.done);
 const urg=v=>pend(v).filter(i=>i.u==='urgent').length;
@@ -146,11 +156,16 @@ const pdoc=id=>fb.F.doc(fb.db,'photos',id);
 const photoGet=id=>CLOUD?fb.F.getDoc(pdoc(id)).then(s=>s.exists()?s.data().d:null):idb.get(id);
 const photoPut=(id,d)=>CLOUD?fb.F.setDoc(pdoc(id),{d}):idb.put(id,d);
 const photoDel=id=>CLOUD?fb.F.deleteDoc(pdoc(id)):idb.del(id);
-const bigSrc=v=>{const c=photos[v.id];return c&&c.t===v.thumb&&c.d?c.d:v.thumb};
-function needPhoto(v){
-  const c=photos[v.id];if(!v.thumb||(c&&c.t===v.thumb))return;
-  const t=v.thumb;photos[v.id]={t,d:null};
-  photoGet(v.id).then(d=>{if(!d)return;photos[v.id]={t,d};const im=document.getElementById('pic');if(im&&cur()&&cur().id===v.id)im.src=d}).catch(()=>{delete photos[v.id]});
+const MAXP=12;
+// v.pics = [{k: clé de la photo en grand, t: miniature}] ; ancienne version : une seule photo (v.thumb, clé = id du véhicule)
+const pics=v=>Array.isArray(v.pics)?v.pics:v.thumb?[{k:v.id,t:v.thumb}]:[];
+const syncThumb=v=>{const ps=pics(v);if(ps.length)v.thumb=ps[0].t;else delete v.thumb};
+const fresh=v=>S.v.find(x=>x.id===v.id)||v;
+const bigSrc=p=>{const c=photos[p.k];return c&&c.d?c.d:p.t};
+function needPhoto(p){
+  if(!p||photos[p.k])return;
+  photos[p.k]={d:null};
+  photoGet(p.k).then(d=>{if(!d){delete photos[p.k];return}photos[p.k]={d};document.querySelectorAll('img[data-k="'+p.k+'"]').forEach(im=>im.src=d)}).catch(()=>{delete photos[p.k]});
 }
 function loadImg(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{URL.revokeObjectURL(u);res(im)};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('img'))};im.src=u})}
 function jpeg(im,max,q){
@@ -158,14 +173,21 @@ function jpeg(im,max,q){
   c.width=Math.max(1,Math.round(im.naturalWidth*k));c.height=Math.max(1,Math.round(im.naturalHeight*k));
   c.getContext('2d').drawImage(im,0,0,c.width,c.height);return c.toDataURL('image/jpeg',q);
 }
-async function setPhoto(v,file){
-  hint('ph','Préparation de la photo…');
-  let im;try{im=await loadImg(file)}catch(e){hint('ph','Image illisible. Essaie une autre photo.');return}
-  let d=jpeg(im,1280,.72);if(d.length>900000)d=jpeg(im,1000,.6);
-  const t=jpeg(im,240,.6);
-  photos[v.id]={t,d};v.thumb=t;v.up=today();
-  photoPut(v.id,d).catch(fail); // la photo part avant la fiche, pour que l'autre téléphone la trouve
-  saveV(v);render();
+async function addPhotos(v,files){
+  const room=MAXP-pics(v).length,list=files.slice(0,Math.max(0,room));
+  if(!list.length){hint('ph','Maximum '+MAXP+' photos par véhicule.');return}
+  const added=[];let n=0,bad=0;
+  for(const f of list){
+    n++;hint('ph',list.length>1?'Préparation des photos… '+n+'/'+list.length:'Préparation de la photo…');
+    let im;try{im=await loadImg(f)}catch(e){bad++;continue}
+    let d=jpeg(im,1280,.72);if(d.length>900000)d=jpeg(im,1000,.6);
+    const t=jpeg(im,200,.6),k=v.id+'_'+uid();
+    photos[k]={d};photoPut(k,d).catch(fail); // la photo part avant la fiche, pour que l'autre téléphone la trouve
+    added.push({k,t});
+  }
+  const fv=fresh(v);fv.pics=pics(fv).concat(added);syncThumb(fv);fv.up=today();
+  if(added.length)saveV(fv);render();
+  hint('ph',(bad?bad+' image(s) illisible(s). ':'')+(files.length>list.length?'Maximum '+MAXP+' photos : les suivantes n’ont pas été ajoutées.':''));
 }
 
 /* ---------- Enregistrement ---------- */
@@ -186,14 +208,14 @@ function saveV(v){
 }
 function dropV(v){
   delete photos[v.id];
-  if(!CLOUD){save();if(v.thumb)idb.del(v.id).catch(()=>{});return}
+  if(!CLOUD){save();pics(v).forEach(p=>idb.del(p.k).catch(()=>{}));return}
   fb.F.deleteDoc(fb.F.doc(fb.db,'vehicules',v.id)).catch(fail);
-  if(v.thumb)photoDel(v.id).catch(()=>{});
+  pics(v).forEach(p=>photoDel(p.k).catch(()=>{}));
 }
 async function exportData(){
   hint('ih','Préparation du fichier…');
   const out={v:S.v,lastExport:today(),photos:{}};
-  for(const v of S.v)if(v.thumb){try{const d=await photoGet(v.id);if(d)out.photos[v.id]=d}catch(e){}}
+  for(const v of S.v)for(const p of pics(v)){try{const d=await photoGet(p.k);if(d)out.photos[p.k]=d}catch(e){}}
   const blob=new Blob([JSON.stringify(out)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='carnet-atelier-'+today()+'.json';
   document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
@@ -206,7 +228,7 @@ function importData(file){
     let d;try{d=JSON.parse(r.result);if(!d||!Array.isArray(d.v))throw 0}catch(e){hint('ih','Fichier non reconnu.');return}
     const ph=d.photos||{};
     for(const k in photos)delete photos[k];
-    if(CLOUD){for(const v of d.v){if(!v.id)v.id=uid();if(!Array.isArray(v.items))v.items=[];if(ph[v.id])photoPut(v.id,ph[v.id]).catch(fail);saveV(v)}}
+    if(CLOUD){for(const v of d.v){if(!v.id)v.id=uid();if(!Array.isArray(v.items))v.items=[];for(const p of pics(v))if(ph[p.k])photoPut(p.k,ph[p.k]).catch(fail);saveV(v)}}
     else{S={v:d.v,lastExport:d.lastExport};for(const id in ph){try{await idb.put(id,ph[id])}catch(e){}}save()}
     location.hash='';render();hint('ih','Sauvegarde restaurée : '+d.v.length+' véhicule(s).');
   };
@@ -217,7 +239,7 @@ function importData(file){
 const oldLocal=()=>CLOUD&&user&&local&&!local.migrated&&Array.isArray(local.v)?local.v.filter(v=>v&&!/^d[123]$/.test(v.id)):[];
 function markMigrated(){local.migrated=true;try{localStorage.setItem(KEY,JSON.stringify(local))}catch(e){}render()}
 async function migrate(){
-  for(const v of oldLocal()){if(!v.id)v.id=uid();if(!Array.isArray(v.items))v.items=[];let d=null;try{d=await idb.get(v.id)}catch(e){}if(d)photoPut(v.id,d).catch(fail);saveV(v)}
+  for(const v of oldLocal()){if(!v.id)v.id=uid();if(!Array.isArray(v.items))v.items=[];for(const p of pics(v)){let d=null;try{d=await idb.get(p.k)}catch(e){}if(d)photoPut(p.k,d).catch(fail)}saveV(v)}
   markMigrated();
 }
 const authMsg=e=>({'auth/invalid-credential':'Email ou mot de passe incorrect.','auth/wrong-password':'Email ou mot de passe incorrect.','auth/user-not-found':'Email ou mot de passe incorrect.','auth/invalid-email':'Email mal écrit.','auth/missing-email':'Écris ton email.','auth/too-many-requests':'Trop d’essais. Réessaie dans quelques minutes.','auth/network-request-failed':'Pas de réseau. La première connexion demande du réseau.','auth/user-disabled':'Ce compte est désactivé.'}[e&&e.code]||'Connexion impossible ('+(e&&e.code||'erreur')+').');
@@ -287,7 +309,7 @@ function list(){
 }
 function card(v){
   const p=pend(v).sort((a,b)=>ORD[a.u]-ORD[b.u]),u=urg(v);
-  return '<a class="card" href="#v-'+esc(v.id)+'"><div class="row">'+(v.thumb?'<img class="th" src="'+esc(v.thumb)+'" alt="">':'')+'<div class="col">'+plateHtml(v.plaque)+'<span class="who">'+esc(v.client||'Client sans nom')+(v.modele?'<small>'+esc(v.modele)+'</small>':'')+'</span></div><span class="cnt'+(u?' hot':'')+'" title="À prévoir">'+p.length+'</span></div>'+
+  return '<a class="card" href="#v-'+esc(v.id)+'"><div class="row">'+(pics(v).length?'<span class="thw"><img class="th" src="'+esc(pics(v)[0].t)+'" alt="">'+(pics(v).length>1?'<b>'+pics(v).length+'</b>':'')+'</span>':'')+'<div class="col">'+plateHtml(v.plaque)+'<span class="who">'+esc(v.client||'Client sans nom')+(v.modele?'<small>'+esc(v.modele)+'</small>':'')+'</span></div><span class="cnt'+(u?' hot':'')+'" title="À prévoir">'+p.length+'</span></div>'+
   (p.length?'<ul class="mini">'+p.slice(0,4).map(i=>'<li class="u-'+esc(i.u)+'">'+esc(i.t)+'</li>').join('')+(p.length>4?'<li>+'+(p.length-4)+'</li>':'')+'</ul>':'')+'</a>';
 }
 function renderRes(){
@@ -296,7 +318,7 @@ function renderRes(){
   const sm=document.getElementById('sum');if(sm)sm.innerHTML=S.v.length+' véhicule'+(S.v.length>1?'s':'')+' · '+all+' à prévoir'+(u?' · <b>'+u+' urgent'+(u>1?'s':'')+'</b>':'');
   const q=plain(ui.q);let vs=S.v.slice();
   if(q)vs=vs.filter(v=>plain(v.plaque+' '+v.client+' '+v.modele+' '+v.tel).includes(q));
-  else if(ui.f==='prevoir')vs=vs.filter(v=>pend(v).length);
+  else if(ui.f==='prevoir')vs=vs.filter(v=>pend(v).length||!v.items.length);
   else if(ui.f==='urgent')vs=vs.filter(v=>urg(v));
   vs.sort((a,b)=>urg(b)-urg(a)||pend(b).length-pend(a).length||String(b.up||'').localeCompare(String(a.up||'')));
   let h=vs.map(card).join('');
@@ -312,11 +334,13 @@ function itemHtml(i){
 function detail(v){
   const p=pend(v).sort((a,b)=>ORD[a.u]-ORD[b.u]),d=v.items.filter(i=>i.done).sort((a,b)=>String(b.dd||'').localeCompare(String(a.dd||'')));
   const info=[v.modele,v.km?Number(String(v.km).replace(/\D/g,'')).toLocaleString('fr-FR')+' km':''].filter(Boolean).map(esc).join(' · ');
-  needPhoto(v);
+  const ps=pics(v);needPhoto(ps[0]);
   return '<header class="top" style="align-items:center"><a class="back" href="#">← Tous les véhicules</a><span class="st" id="st"></span></header>'+banner()+
   '<section class="vh">'+
-  (v.thumb?'<button class="picb" data-a="view" aria-label="Voir la photo en grand"><img id="pic" class="pic" src="'+esc(bigSrc(v))+'" alt="Photo du véhicule"></button>'
-          :'<label class="addpic">'+CAM+'<span>Ajouter une photo du véhicule</span><input type="file" accept="image/*" id="phin" hidden></label>')+
+  (ps.length?'<button class="picb" data-a="view" data-n="0" aria-label="Voir la photo en grand"><img id="pic" class="pic" data-k="'+esc(ps[0].k)+'" src="'+esc(bigSrc(ps[0]))+'" alt="Photo du véhicule"></button>'+
+     '<div class="strip">'+ps.map((p,n)=>'<button class="sth'+(n?'':' on')+'" data-a="view" data-n="'+n+'" aria-label="Photo '+(n+1)+'"><img src="'+esc(p.t)+'" alt=""></button>').join('')+
+     (ps.length<MAXP?'<label class="sth add" aria-label="Ajouter des photos">+<input type="file" accept="image/*" multiple id="phin" hidden></label>':'')+'</div>'
+     :'<label class="addpic">'+CAM+'<span>Ajouter des photos du véhicule</span><input type="file" accept="image/*" multiple id="phin" hidden></label>')+
   '<div class="hint" id="ph"></div>'+
   plateHtml(v.plaque,1)+'<h2>'+esc(v.client||'Client sans nom')+'</h2><p>'+(info||'Aucune info véhicule')+(v.tel?'<br><a href="tel:'+esc(String(v.tel).replace(/[^\d+]/g,''))+'">'+esc(v.tel)+'</a>':'')+'</p>'+
   '<div class="acts"><button class="btn" data-a="edit">Modifier</button>'+(p.length?'<button class="btn" data-a="msg">Message au client</button>':'')+'</div>'+
@@ -330,7 +354,13 @@ function detail(v){
   '<div style="margin-top:30px"><button class="btn danger" data-a="delv">Supprimer ce véhicule</button></div>';
 }
 function viewerHtml(v){
-  return '<div class="viewer" data-a="closebg" role="dialog" aria-label="Photo du véhicule"><img src="'+esc(bigSrc(v))+'" alt="Photo du véhicule"><div class="vbar"><label class="btn">Changer la photo<input type="file" accept="image/*" id="phin" hidden></label><button class="btn danger" data-a="delphoto">Retirer</button><button class="btn primary" data-a="close">Fermer</button></div></div>';
+  const ps=pics(v),n=Math.min(ui.viewer,ps.length-1),p=ps[n];needPhoto(p);
+  return '<div class="viewer" data-a="closebg" role="dialog" aria-label="Photos du véhicule"><div class="vimg">'+
+  (ps.length>1?'<button class="nav prev" data-a="vprev" aria-label="Photo précédente">‹</button>':'')+
+  '<img data-k="'+esc(p.k)+'" src="'+esc(bigSrc(p))+'" alt="Photo '+(n+1)+' du véhicule">'+
+  (ps.length>1?'<button class="nav next" data-a="vnext" aria-label="Photo suivante">›</button>':'')+'</div>'+
+  (ps.length>1?'<div class="vcount">'+(n+1)+' / '+ps.length+(n===0?' · principale':'')+'</div>':'')+
+  '<div class="vbar">'+(n>0?'<button class="btn" data-a="vcover">Mettre en principale</button>':'')+'<button class="btn danger" data-a="delphoto">Retirer</button><button class="btn primary" data-a="close">Fermer</button></div></div>';
 }
 function formHtml(){
   const v=ui.form;
@@ -343,7 +373,7 @@ function formHtml(){
 }
 function confirmHtml(){
   const ph=ui.confirm==='photo';
-  return '<div class="sheet" data-a="closebg"><div role="dialog" aria-label="Confirmer"><h3>'+(ph?'Retirer la photo ?':'Supprimer ce véhicule ?')+'</h3><p>'+(ph?'La photo de ce véhicule sera effacée.':'Toutes ses notes seront effacées.')+'</p><div class="end"><button class="btn" data-a="close">Annuler</button><button class="btn danger" data-a="'+(ph?'delphotook':'delok')+'">'+(ph?'Retirer':'Supprimer')+'</button></div></div></div>';
+  return '<div class="sheet" data-a="closebg"><div role="dialog" aria-label="Confirmer"><h3>'+(ph?'Retirer la photo ?':'Supprimer ce véhicule ?')+'</h3><p>'+(ph?'Cette photo sera effacée.':'Toutes ses notes seront effacées.')+'</p><div class="end"><button class="btn" data-a="close">Annuler</button><button class="btn danger" data-a="'+(ph?'delphotook':'delok')+'">'+(ph?'Retirer':'Supprimer')+'</button></div></div></div>';
 }
 function loginHtml(){
   return '<header class="top"><div class="brand">'+LOGO+'<div><h1>GARAGE DU 16ème</h1><p class="sub">Carnet partagé de l’atelier</p></div></div></header>'+
@@ -360,13 +390,13 @@ function render(){
   else if(CLOUD&&!user)h=loginHtml();
   else if(v)h=detail(v);
   else{h=list();isList=true}
-  root.innerHTML='<div class="wrap">'+h+'</div>'+(ui.form&&(!CLOUD||user)?formHtml():'')+(ui.confirm&&v?confirmHtml():'')+(ui.viewer&&v&&v.thumb?viewerHtml(v):'');
+  root.innerHTML='<div class="wrap">'+h+'</div>'+(ui.form&&(!CLOUD||user)?formHtml():'')+(ui.confirm&&v?confirmHtml():'')+(ui.viewer!=null&&v&&pics(v).length?viewerHtml(v):'');
   if(isList)renderRes();
   setStatus();
   if(ui.form&&!ui.form.id){const f=document.getElementById(ui.form.plaque?'f-client':'f-plaque');if(f)f.focus()}
 }
 // Une modif arrive de l'autre téléphone : on n'efface pas ce que tu es en train de taper
-function busy(){const a=document.activeElement;return !!(ui.form||ui.confirm||ui.viewer||(a&&root.contains(a)&&(a.tagName==='TEXTAREA'||(a.tagName==='INPUT'&&a.type!=='file'))))}
+function busy(){const a=document.activeElement;return !!(ui.form||ui.confirm||ui.viewer!=null||(a&&root.contains(a)&&(a.tagName==='TEXTAREA'||(a.tagName==='INPUT'&&a.type!=='file'))))}
 function softRender(){
   const a=document.activeElement;
   if(!cur()&&a&&a.id==='q'&&!ui.form){renderRes();setStatus();pendingRender=true;return}
@@ -406,7 +436,7 @@ root.addEventListener('click',e=>{
   if(a==='filt'){ui.f=b.dataset.k;render();return}
   if(a==='new'){ui.form={};render();return}
   if(a==='newq'){const q=ui.q.trim();ui.form=/\d/.test(q)?{plaque:normPlate(q)}:{client:q};render();return}
-  if(a==='close'){ui.form=null;ui.confirm=null;ui.viewer=null;render();return}
+  if(a==='close'){ui.form=null;ui.confirm=null;ui.viewer=null;ui.delIdx=null;render();return}
   if(a==='cleardemo'){S.v=[];S.demo=false;render();save();return}
   if(a==='savev'){
     const g=k=>document.getElementById('f-'+k).value.trim();
@@ -421,9 +451,11 @@ root.addEventListener('click',e=>{
   }
   if(!v)return;
   if(a==='edit'){ui.form=Object.assign({},v);render();return}
-  if(a==='view'){ui.viewer=1;render();return}
-  if(a==='delphoto'){ui.viewer=null;ui.confirm='photo';render();return}
-  if(a==='delphotook'){photoDel(v.id).catch(fail);delete photos[v.id];delete v.thumb;v.up=today();ui.confirm=null;render();saveV(v);return}
+  if(a==='view'){ui.viewer=+b.dataset.n||0;render();return}
+  if(a==='vprev'||a==='vnext'){const L=pics(v).length;ui.viewer=(ui.viewer+(a==='vnext'?1:-1)+L)%L;render();return}
+  if(a==='vcover'){const ps=pics(v).slice(),p=ps.splice(ui.viewer,1)[0];ps.unshift(p);v.pics=ps;syncThumb(v);v.up=today();ui.viewer=0;render();saveV(v);return}
+  if(a==='delphoto'){ui.delIdx=ui.viewer;ui.viewer=null;ui.confirm='photo';render();return}
+  if(a==='delphotook'){const ps=pics(v).slice(),p=ps.splice(ui.delIdx,1)[0];if(p){photoDel(p.k).catch(fail);delete photos[p.k]}v.pics=ps;syncThumb(v);v.up=today();ui.confirm=null;ui.delIdx=null;render();saveV(v);return}
   if(a==='delv'){ui.confirm='veh';render();return}
   if(a==='delok'){S.v=S.v.filter(x=>x!==v);ui.confirm=null;location.hash='';render();dropV(v);return}
   if(a==='msg'){ui.msg=1;render();return}
@@ -448,7 +480,7 @@ root.addEventListener('click',e=>{
 });
 root.addEventListener('change',e=>{
   if(e.target.id==='imp'&&e.target.files[0])importData(e.target.files[0]);
-  if(e.target.id==='phin'&&e.target.files[0]){const v=cur(),f=e.target.files[0];if(!v)return;ui.viewer=null;render();setPhoto(v,f)}
+  if(e.target.id==='phin'&&e.target.files.length){const v=cur(),fl=[...e.target.files];if(!v)return;ui.viewer=null;render();addPhotos(v,fl)}
 });
 root.addEventListener('input',e=>{
   if(e.target.id==='q'){ui.q=e.target.value;ss('q',ui.q);renderRes()}
@@ -461,6 +493,9 @@ root.addEventListener('keydown',e=>{
   else if(e.target.id==='lp'){e.preventDefault();const b=root.querySelector('[data-a=login]');if(b)b.click()}
   else if(e.target.id&&e.target.id.indexOf('f-')===0){e.preventDefault();const b=root.querySelector('[data-a=savev]');if(b)b.click()}
 });
+let tx=null;
+root.addEventListener('touchstart',e=>{tx=ui.viewer!=null&&e.touches.length===1?e.touches[0].clientX:null},{passive:true});
+root.addEventListener('touchend',e=>{if(tx===null||ui.viewer==null)return;const dx=e.changedTouches[0].clientX-tx;tx=null;if(Math.abs(dx)>50){const b=root.querySelector(dx<0?'[data-a=vnext]':'[data-a=vprev]');if(b)b.click()}});
 addEventListener('hashchange',()=>{ui.form=null;ui.confirm=null;ui.msg=null;ui.viewer=null;render();scrollTo(0,0)});
 render();
 if(CLOUD)initCloud();

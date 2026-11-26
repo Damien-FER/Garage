@@ -46,8 +46,10 @@ de l'option payante « Storage ». Le plan gratuit suffit largement pour un gara
 2. Bouton Partager (carré avec une flèche) > « Sur l'écran d'accueil » > Ajouter.
 3. Lance toujours l'appli depuis l'icône de l'écran d'accueil, et connecte-toi **dans l'appli**
    (la connexion faite dans Safari n'est pas reprise par l'icône, c'est normal).
-4. Pour la photo : sur une fiche, « Ajouter une photo du véhicule ». L'iPhone propose
-   « Prendre une photo » ou « Photothèque ». Touche la photo pour la voir en grand, la changer ou la retirer.
+4. Pour les photos : sur une fiche, « Ajouter des photos du véhicule » (jusqu'à 12 par véhicule). L'iPhone propose
+   « Prendre une photo » ou « Photothèque » (on peut en choisir plusieurs d'un coup). Le « + » à côté des
+   miniatures en ajoute d'autres. Touche une photo pour la voir en grand, passer à la suivante (flèches ou glisser),
+   la mettre en principale (celle qu'on voit dans la liste) ou la retirer.
 
 Si tu avais déjà des notes en mode local sur ton téléphone, l'appli propose, après connexion, de les mettre
 dans le carnet partagé.
