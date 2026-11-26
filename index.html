@@ -5,7 +5,7 @@
    PICTURE: la liste des véhicules elle-même, plaques en tête de fiche
    COLOUR and TYPE: blanc, encre, bleu plaque, orange signal ; Barlow Condensed + Barlow
    LAYOUT: une colonne mobile, recherche en haut, bouton + fixe en bas */
-:root{color-scheme:light dark;--bg:light-dark(#ffffff,#121417);--card:light-dark(#f2f3f5,#1c1f24);--ink:light-dark(#15171a,#eef0f3);--mut:light-dark(#5d636c,#9aa1ab);--line:light-dark(#dcdfe4,#2e333b);--blue:#2346a8;--red:#e4572e;--amb:#e0a10e;--grey:light-dark(#7d848e,#6f7680)}
+:root{color-scheme:light dark;--bg:light-dark(#ffffff,#121417);--card:light-dark(#f2f3f5,#1c1f24);--ink:light-dark(#15171a,#eef0f3);--mut:light-dark(#5d636c,#9aa1ab);--line:light-dark(#dcdfe4,#2e333b);--blue:#2346a8;--red:#e4572e;--amb:#e0a10e;--grey:light-dark(#7d848e,#6f7680);--blue-soft:light-dark(#d6def3,#2a3760);--blue-ink:light-dark(#2346a8,#7d9bf0)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Barlow,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip}
@@ -14,7 +14,7 @@ body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Barlow,system-
 .wrap{max-width:640px;margin:0 auto;padding:12px max(4vw,14px) 110px}
 h1,h2,h3{font-family:"Barlow Condensed",Barlow,sans-serif;font-weight:700;line-height:1.05;margin:0;text-wrap:balance}
 h1{font-size:38px}h2{font-size:30px}h3{font-size:21px;margin-bottom:10px}
-.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:8px 0 14px;border-bottom:3px solid var(--ink)}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:8px 0 22px;border-bottom:0;background:linear-gradient(var(--blue),var(--blue)) left calc(100% - 7px)/100% 5px no-repeat,linear-gradient(var(--red),var(--red)) left bottom/100% 3px no-repeat}
 .sub{margin:4px 0 0;color:var(--mut)}
 .brand{display:flex;align-items:center;gap:12px}.brand h1{font-size:clamp(24px,7vw,38px);white-space:nowrap}.logo{flex:none;width:clamp(46px,13vw,64px);height:auto}
 .st{font-size:13px;color:var(--mut);white-space:nowrap;padding-top:8px}
@@ -23,12 +23,13 @@ input,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--bg)
 input:focus,textarea:focus{outline:none;border-color:var(--blue)}
 button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 button{cursor:pointer}
-.search{margin:16px 0 6px}.search input{font-size:18px;border-color:var(--ink)}
+.search{margin:16px 0 6px}.search input{font-size:18px;border-color:var(--blue)}
 .sum{font-size:14px;color:var(--mut);margin:6px 0 10px}.sum b{color:var(--red)}
 .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;transition:opacity .2s}
 .chip{border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:999px;padding:8px 14px;min-height:44px;font:600 15px Barlow,sans-serif}
-.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.card{display:block;text-decoration:none;color:inherit;background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px}
+.chip.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.card{display:block;text-decoration:none;color:inherit;background:var(--card);border:2px solid var(--blue-soft);border-radius:14px;padding:14px;margin-bottom:10px;transition:border-color .15s}
+.card:hover,.card:active{border-color:var(--blue)}
 .row{display:flex;align-items:center;gap:12px}
 .plate{display:inline-flex;align-items:stretch;border:2px solid #1a1a1a;border-radius:6px;background:#fff;color:#111;font:700 20px "Barlow Condensed",sans-serif;letter-spacing:.04em;white-space:nowrap;overflow:hidden;flex:none}
 .plate i{font-style:normal;background:var(--blue);color:#fff;font-size:12px;padding:0 5px 3px;display:flex;align-items:flex-end}
@@ -44,10 +45,10 @@ button{cursor:pointer}
 .empty{text-align:center;color:var(--mut);padding:30px 10px}
 .fab{position:fixed;right:max(16px,calc(50vw - 304px));bottom:calc(18px + env(safe-area-inset-bottom));background:var(--blue);color:#fff;border:0;border-radius:999px;padding:0 22px;height:56px;font:700 18px Barlow,sans-serif;box-shadow:0 6px 18px rgba(0,0,0,.25)}
 .btn{border:2px solid var(--ink);background:var(--bg);color:var(--ink);border-radius:10px;padding:10px 16px;min-height:46px;font:600 16px Barlow,sans-serif}
-.primary{background:var(--ink);color:var(--bg)}
+.primary{background:var(--blue);border-color:var(--blue);color:#fff}
 .danger{border-color:var(--red);color:var(--red);background:transparent}
 .back{display:inline-flex;align-items:center;min-height:44px;color:var(--ink);font-weight:600;text-decoration:none}
-.vh{padding:16px 0 18px;border-bottom:3px solid var(--ink)}
+.vh{padding:16px 0 26px;background:linear-gradient(var(--blue),var(--blue)) left calc(100% - 7px)/100% 5px no-repeat,linear-gradient(var(--red),var(--red)) left bottom/100% 3px no-repeat}
 .vh h2{margin-top:12px}.vh p{margin:4px 0 12px;color:var(--mut)}.vh p a{color:var(--blue);font-weight:600}
 .acts{display:flex;gap:8px;flex-wrap:wrap}
 .box{margin-top:22px}
@@ -79,11 +80,11 @@ details{margin-top:18px}summary{cursor:pointer;font-weight:600;min-height:44px;d
 .end{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px}
 .hint{font-size:13px;color:var(--mut);margin-top:6px;min-height:1.2em}
 @media (prefers-reduced-motion:no-preference){.sheet>div{animation:up .18s ease-out}@keyframes up{from{transform:translateY(30px);opacity:.6}}}
-.th{flex:none;width:56px;height:56px;border-radius:10px;object-fit:cover;background:var(--line)}
+.th{flex:none;width:56px;height:56px;border-radius:10px;object-fit:cover;background:var(--line);border:2px solid var(--blue)}
 .col{flex:1;display:grid;gap:6px;justify-items:start}
 .addpic{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:76px;border:2px dashed var(--line);border-radius:14px;color:var(--mut);font-weight:600;cursor:pointer;margin-bottom:14px}
 .picb{display:block;width:100%;padding:0;border:0;background:none;margin:0 0 14px;cursor:zoom-in}
-.pic{display:block;width:100%;height:220px;object-fit:cover;border-radius:14px;background:var(--card)}
+.pic{display:block;width:100%;height:220px;object-fit:cover;border-radius:14px;background:var(--card);border:3px solid var(--blue);box-shadow:0 4px 0 var(--red)}
 .viewer{position:fixed;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(0,0,0,.92);padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom))}
 .viewer img{max-width:100%;min-height:0;flex:0 1 auto;max-height:calc(100% - 70px);object-fit:contain;border-radius:8px}
 .vbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.vbar .btn{display:inline-flex;align-items:center;cursor:pointer;background:#fff;color:#111;border-color:#fff}.vbar .danger{background:transparent;color:#ff8a65;border-color:#ff8a65}
@@ -92,6 +93,10 @@ details{margin-top:18px}summary{cursor:pointer;font-weight:600;min-height:44px;d
 .who-am-i{margin:0 0 10px!important;font-size:14px}
 .login{max-width:420px;margin:24px auto 0}
 .linkb{border:0;background:none;color:var(--blue);font:600 15px Barlow,sans-serif;padding:10px 0;min-height:44px}
+.box h3,.tools h3,.login h3{display:inline-block;padding-bottom:4px;border-bottom:3px solid var(--red)}
+.sheet>div{border-top:5px solid var(--blue)}
+.addpic{border-color:var(--blue-soft);color:var(--blue-ink)}
+.vh p a{color:var(--blue-ink)}
 </style></head><body><div id="root"></div><script src="config.js"></script><script type="application/json" id="data">{"demo":true,"v":[{"id":"d1","plaque":"GH-482-KL","client":"M. Benali","tel":"06 12 34 56 78","modele":"Peugeot 308 1.5 BlueHDi","km":"142000","up":"2026-11-24","items":[{"id":"a1","t":"Plaquettes AV (environ 3 mm)","u":"urgent","d":"2026-11-24","done":false},{"id":"a2","t":"Pneus AR à changer avant l’hiver","u":"bientot","d":"2026-11-24","done":false},{"id":"a3","t":"Vidange + filtre à huile","u":"surveiller","d":"2026-10-02","done":true,"dd":"2026-11-24"}]},{"id":"d2","plaque":"FN-117-PB","client":"Mme Lefèvre","tel":"07 81 22 40 19","modele":"Renault Clio IV 1.2","km":"98500","up":"2026-11-18","items":[{"id":"b1","t":"Batterie faible au test","u":"bientot","d":"2026-11-18","done":false},{"id":"b2","t":"Essuie-glaces","u":"surveiller","d":"2026-11-18","done":false}]},{"id":"d3","plaque":"DZ-655-RM","client":"M. Garnier","tel":"","modele":"Citroën Berlingo 1.6 HDi","km":"211300","up":"2026-11-10","items":[{"id":"c1","t":"Kit distribution (kilométrage atteint)","u":"urgent","d":"2026-11-10","done":false}]}]}</script><script id="app">{
 const KEY='carnet-atelier-v1';
 const CFG=window.FIREBASE_CONFIG;
