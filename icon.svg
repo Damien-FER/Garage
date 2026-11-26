@@ -1,12 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#2346a8"/>
-  <rect x="96" y="120" width="320" height="300" rx="28" fill="#ffffff"/>
-  <rect x="96" y="120" width="320" height="64" rx="28" fill="#15171a"/>
-  <rect x="96" y="156" width="320" height="28" fill="#15171a"/>
-  <rect x="140" y="232" width="34" height="34" rx="8" fill="none" stroke="#15171a" stroke-width="10"/>
-  <rect x="196" y="240" width="176" height="18" rx="9" fill="#15171a"/>
-  <rect x="140" y="300" width="34" height="34" rx="8" fill="#e4572e"/>
-  <rect x="196" y="308" width="140" height="18" rx="9" fill="#15171a"/>
-  <rect x="140" y="364" width="34" height="34" rx="8" fill="none" stroke="#15171a" stroke-width="10"/>
-  <rect x="196" y="372" width="160" height="18" rx="9" fill="#15171a"/>
+  <rect width="512" height="512" fill="#2346a8"/>
+  <!-- voiture -->
+  <g transform="translate(86 112) scale(1.7)">
+    <path fill="#ffffff" d="M8 58V45q2-8 14-10l30-4 20-17q5-4 13-4h44q8 0 13 5l17 16 25 4q8 2 8 10v13z"/>
+    <path fill="#2346a8" d="M60 31l15-13q3-2 7-2h20v15zM108 16h20q5 0 8 3l12 12h-40z"/>
+    <circle cx="50" cy="58" r="15" fill="#ffffff" stroke="#2346a8" stroke-width="5"/>
+    <circle cx="152" cy="58" r="15" fill="#ffffff" stroke="#2346a8" stroke-width="5"/>
+  </g>
+  <!-- pont élévateur -->
+  <rect x="100" y="262" width="312" height="18" rx="3" fill="#e4572e"/>
+  <rect x="140" y="280" width="16" height="34" fill="#e4572e"/>
+  <rect x="356" y="280" width="16" height="34" fill="#e4572e"/>
+  <text x="256" y="412" fill="#ffffff" font-family="'Barlow Condensed','Arial Narrow',Arial,sans-serif" font-weight="800" font-size="108" letter-spacing="3" text-anchor="middle">16ème</text>
 </svg>
