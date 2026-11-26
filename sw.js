@@ -1,6 +1,6 @@
 // Garde l'appli en cache pour qu'elle s'ouvre sans réseau.
 // Les données du carnet partagé passent par Firebase, qui a son propre cache hors ligne : on n'y touche pas ici.
-const CACHE = 'carnet-v5';
+const CACHE = 'carnet-v6';
 const FILES = ['./', 'index.html', 'config.js', 'manifest.json', 'icon.svg', 'icon-180.png', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {
