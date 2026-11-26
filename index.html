@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Carnet atelier</title><meta name="theme-color" content="#2346a8"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Carnet"><style id="css">
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GARAGE DU 16ème</title><meta name="theme-color" content="#2346a8"><link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icon-192.png"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Garage 16ème"><style id="css">
 /* VOICE: atelier, direct, pratique, une main sur le téléphone
    IDEA: le carnet d'atelier où chaque fiche s'ouvre par sa plaque d'immatriculation
    PICTURE: la liste des véhicules elle-même, plaques en tête de fiche
@@ -267,7 +267,7 @@ function banner(){
   return h;
 }
 function list(){
-  return '<header class="top"><div><h1>Carnet atelier</h1><p class="sub">Ce qu’il faut prévoir au prochain passage</p></div><span class="st" id="st"></span></header>'+banner()+
+  return '<header class="top"><div><h1>GARAGE DU 16ème</h1><p class="sub">Ce qu’il faut prévoir au prochain passage</p></div><span class="st" id="st"></span></header>'+banner()+
   '<div class="search"><input id="q" type="search" autocomplete="off" placeholder="Plaque, nom ou modèle" aria-label="Rechercher" value="'+esc(ui.q)+'"></div>'+
   '<div class="sum" id="sum"></div>'+
   '<div class="chips" id="chips">'+[['prevoir','À prévoir'],['urgent','Urgent'],['tous','Tous']].map(x=>'<button class="chip'+(ui.f===x[0]?' on':'')+'" data-a="filt" data-k="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'+
@@ -339,7 +339,7 @@ function confirmHtml(){
   return '<div class="sheet" data-a="closebg"><div role="dialog" aria-label="Confirmer"><h3>'+(ph?'Retirer la photo ?':'Supprimer ce véhicule ?')+'</h3><p>'+(ph?'La photo de ce véhicule sera effacée.':'Toutes ses notes seront effacées.')+'</p><div class="end"><button class="btn" data-a="close">Annuler</button><button class="btn danger" data-a="'+(ph?'delphotook':'delok')+'">'+(ph?'Retirer':'Supprimer')+'</button></div></div></div>';
 }
 function loginHtml(){
-  return '<header class="top"><div><h1>Carnet atelier</h1><p class="sub">Carnet partagé de l’atelier</p></div></header>'+
+  return '<header class="top"><div><h1>GARAGE DU 16ème</h1><p class="sub">Carnet partagé de l’atelier</p></div></header>'+
   '<div class="login"><h3>Connexion</h3><div class="f"><label for="le">Email</label><input id="le" type="email" autocomplete="username" inputmode="email" autocapitalize="off" autocorrect="off" spellcheck="false"></div>'+
   '<div class="f"><label for="lp">Mot de passe</label><input id="lp" type="password" autocomplete="current-password"></div>'+
   '<button class="btn primary" style="width:100%" data-a="login">Se connecter</button><div class="hint" id="lh"></div>'+
@@ -348,8 +348,8 @@ function loginHtml(){
 function render(){
   pendingRender=false;
   let h,isList=false;const v=CLOUD&&!user?null:cur();
-  if(CLOUD&&loadErr)h='<header class="top"><div><h1>Carnet atelier</h1></div></header><p class="empty">'+esc(loadErr)+'</p><button class="btn primary" style="width:100%" data-a="reload">Réessayer</button>';
-  else if(CLOUD&&user===undefined)h='<header class="top"><div><h1>Carnet atelier</h1></div></header><p class="empty">Chargement…</p>';
+  if(CLOUD&&loadErr)h='<header class="top"><div><h1>GARAGE DU 16ème</h1></div></header><p class="empty">'+esc(loadErr)+'</p><button class="btn primary" style="width:100%" data-a="reload">Réessayer</button>';
+  else if(CLOUD&&user===undefined)h='<header class="top"><div><h1>GARAGE DU 16ème</h1></div></header><p class="empty">Chargement…</p>';
   else if(CLOUD&&!user)h=loginHtml();
   else if(v)h=detail(v);
   else{h=list();isList=true}
