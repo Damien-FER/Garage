@@ -78,18 +78,37 @@ details{margin-top:18px}summary{cursor:pointer;font-weight:600;min-height:44px;d
 .end{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;margin-top:6px}
 .hint{font-size:13px;color:var(--mut);margin-top:6px;min-height:1.2em}
 @media (prefers-reduced-motion:no-preference){.sheet>div{animation:up .18s ease-out}@keyframes up{from{transform:translateY(30px);opacity:.6}}}
-</style></head><body><div id="root"></div><script type="application/json" id="data">{"demo":true,"v":[{"id":"d1","plaque":"GH-482-KL","client":"M. Benali","tel":"06 12 34 56 78","modele":"Peugeot 308 1.5 BlueHDi","km":"142000","up":"2026-11-24","items":[{"id":"a1","t":"Plaquettes AV (environ 3 mm)","u":"urgent","d":"2026-11-24","done":false},{"id":"a2","t":"Pneus AR à changer avant l’hiver","u":"bientot","d":"2026-11-24","done":false},{"id":"a3","t":"Vidange + filtre à huile","u":"surveiller","d":"2026-10-02","done":true,"dd":"2026-11-24"}]},{"id":"d2","plaque":"FN-117-PB","client":"Mme Lefèvre","tel":"07 81 22 40 19","modele":"Renault Clio IV 1.2","km":"98500","up":"2026-11-18","items":[{"id":"b1","t":"Batterie faible au test","u":"bientot","d":"2026-11-18","done":false},{"id":"b2","t":"Essuie-glaces","u":"surveiller","d":"2026-11-18","done":false}]},{"id":"d3","plaque":"DZ-655-RM","client":"M. Garnier","tel":"","modele":"Citroën Berlingo 1.6 HDi","km":"211300","up":"2026-11-10","items":[{"id":"c1","t":"Kit distribution (kilométrage atteint)","u":"urgent","d":"2026-11-10","done":false}]}]}</script><script id="app">{
+.th{flex:none;width:56px;height:56px;border-radius:10px;object-fit:cover;background:var(--line)}
+.col{flex:1;display:grid;gap:6px;justify-items:start}
+.addpic{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:76px;border:2px dashed var(--line);border-radius:14px;color:var(--mut);font-weight:600;cursor:pointer;margin-bottom:14px}
+.picb{display:block;width:100%;padding:0;border:0;background:none;margin:0 0 14px;cursor:zoom-in}
+.pic{display:block;width:100%;height:220px;object-fit:cover;border-radius:14px;background:var(--card)}
+.viewer{position:fixed;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(0,0,0,.92);padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom))}
+.viewer img{max-width:100%;min-height:0;flex:0 1 auto;max-height:calc(100% - 70px);object-fit:contain;border-radius:8px}
+.vbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}.vbar .btn{display:inline-flex;align-items:center;cursor:pointer;background:#fff;color:#111;border-color:#fff}.vbar .danger{background:transparent;color:#ff8a65;border-color:#ff8a65}
+.vh label.addpic input,.vbar input{display:none}
+.banner.warn{background:var(--red);color:#fff}
+.who-am-i{margin:0 0 10px!important;font-size:14px}
+.login{max-width:420px;margin:24px auto 0}
+.linkb{border:0;background:none;color:var(--blue);font:600 15px Barlow,sans-serif;padding:10px 0;min-height:44px}
+</style></head><body><div id="root"></div><script src="config.js"></script><script type="application/json" id="data">{"demo":true,"v":[{"id":"d1","plaque":"GH-482-KL","client":"M. Benali","tel":"06 12 34 56 78","modele":"Peugeot 308 1.5 BlueHDi","km":"142000","up":"2026-11-24","items":[{"id":"a1","t":"Plaquettes AV (environ 3 mm)","u":"urgent","d":"2026-11-24","done":false},{"id":"a2","t":"Pneus AR à changer avant l’hiver","u":"bientot","d":"2026-11-24","done":false},{"id":"a3","t":"Vidange + filtre à huile","u":"surveiller","d":"2026-10-02","done":true,"dd":"2026-11-24"}]},{"id":"d2","plaque":"FN-117-PB","client":"Mme Lefèvre","tel":"07 81 22 40 19","modele":"Renault Clio IV 1.2","km":"98500","up":"2026-11-18","items":[{"id":"b1","t":"Batterie faible au test","u":"bientot","d":"2026-11-18","done":false},{"id":"b2","t":"Essuie-glaces","u":"surveiller","d":"2026-11-18","done":false}]},{"id":"d3","plaque":"DZ-655-RM","client":"M. Garnier","tel":"","modele":"Citroën Berlingo 1.6 HDi","km":"211300","up":"2026-11-10","items":[{"id":"c1","t":"Kit distribution (kilométrage atteint)","u":"urgent","d":"2026-11-10","done":false}]}]}</script><script id="app">{
 const KEY='carnet-atelier-v1';
-let S=null,canStore=true;
-try{const raw=localStorage.getItem(KEY);if(raw)S=JSON.parse(raw)}catch(e){canStore=false}
-if(!S){try{S=JSON.parse(document.getElementById('data').textContent)}catch(e){S={v:[]}}}
-if(!S||!Array.isArray(S.v))S={v:[]};
+const CFG=window.FIREBASE_CONFIG;
+const CLOUD=!!(CFG&&CFG.apiKey);
+const FB='https://www.gstatic.com/firebasejs/10.14.1/';
+let S={v:[]},local=null,canStore=true;
+try{const raw=localStorage.getItem(KEY);if(raw)local=JSON.parse(raw)}catch(e){canStore=false}
+if(!CLOUD){S=local;if(!S){try{S=JSON.parse(document.getElementById('data').textContent)}catch(e){}}if(!S||!Array.isArray(S.v))S={v:[]}}
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+// Mode partagé : fb = modules Firebase ; user undefined = on ne sait pas encore, null = pas connecté
+let fb=null,user=CLOUD?undefined:null,ready=!CLOUD,cloudErr='',loadErr='',unsub=null,pendingRender=false;
+const photos={}; // cache des photos en grand : id -> {t: miniature correspondante, d: photo}
 const root=document.getElementById('root');
 const PRESETS=['Pneus AV','Pneus AR','Plaquettes AV','Plaquettes AR','Disques AV','Disques AR','Vidange','Filtres','Distribution','Batterie','Essuie-glaces','Amortisseurs','Liquide de frein','Courroie accessoires','Embrayage','Contrôle technique','Parallélisme','Clim'];
 const U={urgent:'Urgent',bientot:'Bientôt',surveiller:'À surveiller'};
 const ORD={urgent:0,bientot:1,surveiller:2};
 const MIC='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+const CAM='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M3 8h4l2-3h6l2 3h4v11H3z"/><circle cx="12" cy="13" r="3.5"/></svg>';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Math.random().toString(36).slice(2,9);
 const today=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
@@ -97,31 +116,128 @@ const fmtD=d=>{if(!d)return'';const p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0]
 const plain=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
 const normPlate=p=>{const s=String(p||'').toUpperCase().replace(/[^A-Z0-9]/g,'');if(/^[A-Z]{2}\d{3}[A-Z]{2}$/.test(s))return s.slice(0,2)+'-'+s.slice(2,5)+'-'+s.slice(5);return String(p||'').toUpperCase().trim()};
 const ss=(k,v)=>{try{if(v===undefined)return sessionStorage.getItem(k)||'';sessionStorage.setItem(k,v)}catch(e){return''}};
-const ui={q:ss('q'),f:'prevoir',u:'bientot',draft:ss('draft'),form:null,confirm:null,msg:null};
+const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k)||'';localStorage.setItem(k,v)}catch(e){return''}};
+const ui={q:ss('q'),f:'prevoir',u:'bientot',draft:ss('draft'),form:null,confirm:null,msg:null,viewer:null};
 let dict=null,listening=false,status='';
 const pend=v=>v.items.filter(i=>!i.done);
 const urg=v=>pend(v).filter(i=>i.u==='urgent').length;
-const cur=()=>{const m=location.hash.match(/^#v-([a-z0-9]+)$/);return m?S.v.find(v=>v.id===m[1]):null};
+const cur=()=>{const m=location.hash.match(/^#v-([a-z0-9]+)$/i);return m?S.v.find(v=>v.id===m[1]):null};
 const plateHtml=(p,big)=>'<span class="plate'+(big?' big':'')+'"><i>F</i><b>'+esc(p||'—')+'</b></span>';
 const setStatus=()=>{const el=document.getElementById('st');if(el)el.textContent=status};
 const hint=(id,t)=>{const el=document.getElementById(id);if(el)el.textContent=t};
+// Prénom affiché à côté des notes (partie de l'email avant le point)
+const me=()=>{if(!CLOUD||!user)return'';const n=String(user.displayName||user.email||'').split(/[^A-Za-zÀ-ÿ]/)[0];return n?n[0].toUpperCase()+n.slice(1).toLowerCase():''};
+const lastExp=()=>CLOUD?ls('carnet-last-export'):S.lastExport;
 
+/* ---------- Photos : IndexedDB en mode local, Firestore (collection "photos") en mode partagé ---------- */
+const idb=(()=>{let p=null;
+  const open=()=>p||(p=new Promise((res,rej)=>{const r=indexedDB.open('carnet-photos',1);r.onupgradeneeded=()=>r.result.createObjectStore('p');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}));
+  const run=(mode,fn)=>open().then(db=>new Promise((res,rej)=>{const t=db.transaction('p',mode),q=fn(t.objectStore('p'));t.oncomplete=()=>res(q.result);t.onerror=t.onabort=()=>rej(t.error)}));
+  return{get:k=>run('readonly',s=>s.get(k)),put:(k,v)=>run('readwrite',s=>s.put(v,k)),del:k=>run('readwrite',s=>s.delete(k))};
+})();
+const pdoc=id=>fb.F.doc(fb.db,'photos',id);
+const photoGet=id=>CLOUD?fb.F.getDoc(pdoc(id)).then(s=>s.exists()?s.data().d:null):idb.get(id);
+const photoPut=(id,d)=>CLOUD?fb.F.setDoc(pdoc(id),{d}):idb.put(id,d);
+const photoDel=id=>CLOUD?fb.F.deleteDoc(pdoc(id)):idb.del(id);
+const bigSrc=v=>{const c=photos[v.id];return c&&c.t===v.thumb&&c.d?c.d:v.thumb};
+function needPhoto(v){
+  const c=photos[v.id];if(!v.thumb||(c&&c.t===v.thumb))return;
+  const t=v.thumb;photos[v.id]={t,d:null};
+  photoGet(v.id).then(d=>{if(!d)return;photos[v.id]={t,d};const im=document.getElementById('pic');if(im&&cur()&&cur().id===v.id)im.src=d}).catch(()=>{delete photos[v.id]});
+}
+function loadImg(file){return new Promise((res,rej)=>{const u=URL.createObjectURL(file),im=new Image();im.onload=()=>{URL.revokeObjectURL(u);res(im)};im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('img'))};im.src=u})}
+function jpeg(im,max,q){
+  const k=Math.min(1,max/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');
+  c.width=Math.max(1,Math.round(im.naturalWidth*k));c.height=Math.max(1,Math.round(im.naturalHeight*k));
+  c.getContext('2d').drawImage(im,0,0,c.width,c.height);return c.toDataURL('image/jpeg',q);
+}
+async function setPhoto(v,file){
+  hint('ph','Préparation de la photo…');
+  let im;try{im=await loadImg(file)}catch(e){hint('ph','Image illisible. Essaie une autre photo.');return}
+  let d=jpeg(im,1280,.72);if(d.length>900000)d=jpeg(im,1000,.6);
+  const t=jpeg(im,240,.6);
+  photos[v.id]={t,d};v.thumb=t;v.up=today();
+  photoPut(v.id,d).catch(fail); // la photo part avant la fiche, pour que l'autre téléphone la trouve
+  saveV(v);render();
+}
+
+/* ---------- Enregistrement ---------- */
 function save(){
+  if(CLOUD)return;
   try{localStorage.setItem(KEY,JSON.stringify(S));status='Enregistré sur le téléphone';canStore=true}
   catch(e){status='Pas enregistré !';canStore=false}
   setStatus();
 }
-function exportData(){
-  const blob=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});
+function fail(err){
+  cloudErr=err&&err.code==='permission-denied'?'Accès refusé : ce compte n’est pas autorisé dans les règles Firestore.':'Une modification n’a pas pu être enregistrée'+(err&&err.code?' ('+err.code+')':'')+'.';
+  status='Pas enregistré !';softRender();
+}
+function saveV(v){
+  if(!CLOUD){save();return}
+  const data=JSON.parse(JSON.stringify(v));delete data.id;
+  fb.F.setDoc(fb.F.doc(fb.db,'vehicules',v.id),data).catch(fail);
+}
+function dropV(v){
+  delete photos[v.id];
+  if(!CLOUD){save();if(v.thumb)idb.del(v.id).catch(()=>{});return}
+  fb.F.deleteDoc(fb.F.doc(fb.db,'vehicules',v.id)).catch(fail);
+  if(v.thumb)photoDel(v.id).catch(()=>{});
+}
+async function exportData(){
+  hint('ih','Préparation du fichier…');
+  const out={v:S.v,lastExport:today(),photos:{}};
+  for(const v of S.v)if(v.thumb){try{const d=await photoGet(v.id);if(d)out.photos[v.id]=d}catch(e){}}
+  const blob=new Blob([JSON.stringify(out)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='carnet-atelier-'+today()+'.json';
   document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
-  S.lastExport=today();save();render();
+  if(CLOUD)ls('carnet-last-export',today());else{S.lastExport=today();save()}
+  render();
 }
 function importData(file){
   const r=new FileReader();
-  r.onload=()=>{try{const d=JSON.parse(r.result);if(!d||!Array.isArray(d.v))throw 0;S=d;save();location.hash='';render();hint('ih','Sauvegarde restaurée : '+S.v.length+' véhicule(s).')}catch(e){hint('ih','Fichier non reconnu.')}};
+  r.onload=async()=>{
+    let d;try{d=JSON.parse(r.result);if(!d||!Array.isArray(d.v))throw 0}catch(e){hint('ih','Fichier non reconnu.');return}
+    const ph=d.photos||{};
+    for(const k in photos)delete photos[k];
+    if(CLOUD){for(const v of d.v){if(!v.id)v.id=uid();if(!Array.isArray(v.items))v.items=[];if(ph[v.id])photoPut(v.id,ph[v.id]).catch(fail);saveV(v)}}
+    else{S={v:d.v,lastExport:d.lastExport};for(const id in ph){try{await idb.put(id,ph[id])}catch(e){}}save()}
+    location.hash='';render();hint('ih','Sauvegarde restaurée : '+d.v.length+' véhicule(s).');
+  };
   r.readAsText(file);
 }
+
+/* ---------- Mode partagé (Firebase) ---------- */
+const oldLocal=()=>CLOUD&&user&&local&&!local.migrated&&Array.isArray(local.v)?local.v.filter(v=>v&&!/^d[123]$/.test(v.id)):[];
+function markMigrated(){local.migrated=true;try{localStorage.setItem(KEY,JSON.stringify(local))}catch(e){}render()}
+async function migrate(){
+  for(const v of oldLocal()){if(!v.id)v.id=uid();if(!Array.isArray(v.items))v.items=[];let d=null;try{d=await idb.get(v.id)}catch(e){}if(d)photoPut(v.id,d).catch(fail);saveV(v)}
+  markMigrated();
+}
+const authMsg=e=>({'auth/invalid-credential':'Email ou mot de passe incorrect.','auth/wrong-password':'Email ou mot de passe incorrect.','auth/user-not-found':'Email ou mot de passe incorrect.','auth/invalid-email':'Email mal écrit.','auth/missing-email':'Écris ton email.','auth/too-many-requests':'Trop d’essais. Réessaie dans quelques minutes.','auth/network-request-failed':'Pas de réseau. La première connexion demande du réseau.','auth/user-disabled':'Ce compte est désactivé.'}[e&&e.code]||'Connexion impossible ('+(e&&e.code||'erreur')+').');
+async function initCloud(){
+  try{
+    const [A,Au,F]=await Promise.all([import(FB+'firebase-app.js'),import(FB+'firebase-auth.js'),import(FB+'firebase-firestore.js')]);
+    const app=A.initializeApp(CFG),auth=Au.getAuth(app);
+    let db;try{db=F.initializeFirestore(app,{localCache:F.persistentLocalCache({tabManager:F.persistentMultipleTabManager()})})}catch(e){db=F.getFirestore(app)}
+    fb={Au,F,auth,db};
+    Au.onAuthStateChanged(auth,u=>{
+      user=u;if(unsub){unsub();unsub=null}
+      S.v=[];ready=false;cloudErr='';for(const k in photos)delete photos[k];
+      if(u){
+        unsub=F.onSnapshot(F.collection(db,'vehicules'),{includeMetadataChanges:true},snap=>{
+          const ch=snap.docChanges().length,first=!ready;
+          if(ch||first)S.v=snap.docs.map(d=>Object.assign({items:[]},d.data(),{id:d.id}));
+          status=snap.metadata.hasPendingWrites?'Envoi en attente…':snap.metadata.fromCache?'Hors ligne · gardé ici':'Synchronisé';
+          ready=true;if(!snap.metadata.hasPendingWrites)cloudErr='';
+          if(ch||first)softRender();else setStatus();
+        },err=>{ready=true;fail(err)});
+      }
+      render();
+    });
+  }catch(e){loadErr='Impossible de charger le carnet partagé. Vérifie le réseau, puis réessaie.';render()}
+}
+
+/* ---------- Dictée ---------- */
 const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 if(SR){
   dict={rec:null,
@@ -139,30 +255,38 @@ function msgText(v){
   const p=pend(v).sort((a,b)=>ORD[a.u]-ORD[b.u]);
   return 'Bonjour'+(v.client?' '+v.client:'')+',\n\nLors du passage de votre '+(v.modele||'véhicule')+(v.plaque?' ('+v.plaque+')':'')+', nous avons noté qu’il faudra prévoir :\n'+p.map(i=>'- '+i.t+(i.u==='urgent'?' (urgent)':'')).join('\n')+'\n\nN’hésitez pas à nous appeler pour prendre rendez-vous.\nBonne journée !';
 }
+
+/* ---------- Écrans ---------- */
 function banner(){
   let h='';
-  if(!canStore)h+='<div class="banner">Ce navigateur bloque l’enregistrement local (navigation privée ?). Les notes seront perdues en fermant.</div>';
-  if(S.demo)h+='<div class="banner"><span>Ce sont des exemples pour tester.</span><button class="btn" data-a="cleardemo">Effacer les exemples</button></div>';
+  if(!canStore&&!CLOUD)h+='<div class="banner">Ce navigateur bloque l’enregistrement local (navigation privée ?). Les notes seront perdues en fermant.</div>';
+  if(cloudErr)h+='<div class="banner warn">'+esc(cloudErr)+'</div>';
+  if(S.demo&&!CLOUD)h+='<div class="banner"><span>Ce sont des exemples pour tester.</span><button class="btn" data-a="cleardemo">Effacer les exemples</button></div>';
+  const ol=oldLocal();
+  if(ol.length)h+='<div class="banner"><span>Ce téléphone a '+ol.length+' véhicule'+(ol.length>1?'s':'')+' noté'+(ol.length>1?'s':'')+' avant le partage.</span><span class="acts"><button class="btn primary" data-a="migrate">Les mettre dans le carnet partagé</button><button class="btn" data-a="skipmig">Ignorer</button></span></div>';
   return h;
 }
 function list(){
-  const all=S.v.reduce((a,v)=>a+pend(v).length,0),u=S.v.reduce((a,v)=>a+urg(v),0);
   return '<header class="top"><div><h1>Carnet atelier</h1><p class="sub">Ce qu’il faut prévoir au prochain passage</p></div><span class="st" id="st"></span></header>'+banner()+
   '<div class="search"><input id="q" type="search" autocomplete="off" placeholder="Plaque, nom ou modèle" aria-label="Rechercher" value="'+esc(ui.q)+'"></div>'+
-  '<div class="sum">'+S.v.length+' véhicule'+(S.v.length>1?'s':'')+' · '+all+' à prévoir'+(u?' · <b>'+u+' urgent'+(u>1?'s':'')+'</b>':'')+'</div>'+
+  '<div class="sum" id="sum"></div>'+
   '<div class="chips" id="chips">'+[['prevoir','À prévoir'],['urgent','Urgent'],['tous','Tous']].map(x=>'<button class="chip'+(ui.f===x[0]?' on':'')+'" data-a="filt" data-k="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'+
   '<div id="res"></div>'+
-  '<div class="tools"><h3>Sauvegarde</h3><div class="acts"><button class="btn" data-a="export">Exporter (fichier)</button><label class="btn">Restaurer<input type="file" id="imp" accept=".json,application/json"></label></div>'+
-  '<p>Tout reste sur ce téléphone. Exporte de temps en temps pour ne rien perdre si tu changes de téléphone ou vides le navigateur.'+(S.lastExport?' Dernier export : '+esc(fmtD(S.lastExport))+'.':'')+'</p><div class="hint" id="ih"></div></div>'+
+  '<div class="tools"><h3>'+(CLOUD?'Compte et sauvegarde':'Sauvegarde')+'</h3>'+
+  (CLOUD?'<p class="who-am-i">Carnet partagé · connecté : <b>'+esc(user.email)+'</b></p>':'')+
+  '<div class="acts"><button class="btn" data-a="export">Exporter (fichier)</button><label class="btn">Restaurer<input type="file" id="imp" accept=".json,application/json"></label>'+(CLOUD?'<button class="btn" data-a="logout">Se déconnecter</button>':'')+'</div>'+
+  '<p>'+(CLOUD?'Les notes et photos sont partagées entre vos téléphones et gardées en ligne. « Exporter » fait une copie de secours en plus.':'Tout reste sur ce téléphone. Exporte de temps en temps pour ne rien perdre si tu changes de téléphone ou vides le navigateur.')+(lastExp()?' Dernier export : '+esc(fmtD(lastExp()))+'.':'')+'</p><div class="hint" id="ih"></div></div>'+
   '<button class="fab" data-a="new">+ Véhicule</button>';
 }
 function card(v){
   const p=pend(v).sort((a,b)=>ORD[a.u]-ORD[b.u]),u=urg(v);
-  return '<a class="card" href="#v-'+esc(v.id)+'"><div class="row">'+plateHtml(v.plaque)+'<span class="who">'+esc(v.client||'Client sans nom')+(v.modele?'<small>'+esc(v.modele)+'</small>':'')+'</span><span class="cnt'+(u?' hot':'')+'" title="À prévoir">'+p.length+'</span></div>'+
+  return '<a class="card" href="#v-'+esc(v.id)+'"><div class="row">'+(v.thumb?'<img class="th" src="'+esc(v.thumb)+'" alt="">':'')+'<div class="col">'+plateHtml(v.plaque)+'<span class="who">'+esc(v.client||'Client sans nom')+(v.modele?'<small>'+esc(v.modele)+'</small>':'')+'</span></div><span class="cnt'+(u?' hot':'')+'" title="À prévoir">'+p.length+'</span></div>'+
   (p.length?'<ul class="mini">'+p.slice(0,4).map(i=>'<li class="u-'+esc(i.u)+'">'+esc(i.t)+'</li>').join('')+(p.length>4?'<li>+'+(p.length-4)+'</li>':'')+'</ul>':'')+'</a>';
 }
 function renderRes(){
   const el=document.getElementById('res');if(!el)return;
+  const all=S.v.reduce((a,v)=>a+pend(v).length,0),u=S.v.reduce((a,v)=>a+urg(v),0);
+  const sm=document.getElementById('sum');if(sm)sm.innerHTML=S.v.length+' véhicule'+(S.v.length>1?'s':'')+' · '+all+' à prévoir'+(u?' · <b>'+u+' urgent'+(u>1?'s':'')+'</b>':'');
   const q=plain(ui.q);let vs=S.v.slice();
   if(q)vs=vs.filter(v=>plain(v.plaque+' '+v.client+' '+v.modele+' '+v.tel).includes(q));
   else if(ui.f==='prevoir')vs=vs.filter(v=>pend(v).length);
@@ -170,18 +294,24 @@ function renderRes(){
   vs.sort((a,b)=>urg(b)-urg(a)||pend(b).length-pend(a).length||String(b.up||'').localeCompare(String(a.up||'')));
   let h=vs.map(card).join('');
   if(q&&!S.v.some(v=>plain(v.plaque)===q))h+='<button class="btn" style="width:100%;margin-top:4px" data-a="newq">+ Nouveau véhicule « '+esc(ui.q.trim())+' »</button>';
-  if(!vs.length&&!q)h='<p class="empty">'+(S.v.length?'Rien à prévoir pour l’instant.':'Aucun véhicule. Appuie sur « + Véhicule » pour commencer.')+'</p>';
+  if(!vs.length&&!q)h='<p class="empty">'+(!ready?'Chargement du carnet…':S.v.length?'Rien à prévoir pour l’instant.':'Aucun véhicule. Appuie sur « + Véhicule » pour commencer.')+'</p>';
   el.innerHTML=h;
   const c=document.getElementById('chips');if(c)c.style.opacity=q?'.4':'1';
 }
 function itemHtml(i){
-  return '<li class="'+(i.done?'done':'')+'"><button class="tick" data-a="tog" data-i="'+esc(i.id)+'" aria-label="'+(i.done?'Remettre à prévoir':'Marquer comme fait')+'">'+(i.done?'✓':'')+'</button><div class="it"><b>'+esc(i.t)+'</b><div class="meta">'+(i.done?'Fait le '+esc(fmtD(i.dd)):'<span class="tag '+esc(i.u)+'">'+esc(U[i.u]||'')+'</span>noté le '+esc(fmtD(i.d)))+'</div></div><button class="x" data-a="deli" data-i="'+esc(i.id)+'" aria-label="Supprimer">×</button></li>';
+  const by=n=>n?' · '+esc(n):'';
+  return '<li class="'+(i.done?'done':'')+'"><button class="tick" data-a="tog" data-i="'+esc(i.id)+'" aria-label="'+(i.done?'Remettre à prévoir':'Marquer comme fait')+'">'+(i.done?'✓':'')+'</button><div class="it"><b>'+esc(i.t)+'</b><div class="meta">'+(i.done?'Fait le '+esc(fmtD(i.dd))+by(i.fp):'<span class="tag '+esc(i.u)+'">'+esc(U[i.u]||'')+'</span>noté le '+esc(fmtD(i.d))+by(i.par))+'</div></div><button class="x" data-a="deli" data-i="'+esc(i.id)+'" aria-label="Supprimer">×</button></li>';
 }
 function detail(v){
   const p=pend(v).sort((a,b)=>ORD[a.u]-ORD[b.u]),d=v.items.filter(i=>i.done).sort((a,b)=>String(b.dd||'').localeCompare(String(a.dd||'')));
   const info=[v.modele,v.km?Number(String(v.km).replace(/\D/g,'')).toLocaleString('fr-FR')+' km':''].filter(Boolean).map(esc).join(' · ');
-  return '<header class="top" style="align-items:center"><a class="back" href="#">← Tous les véhicules</a><span class="st" id="st"></span></header>'+
-  '<section class="vh">'+plateHtml(v.plaque,1)+'<h2>'+esc(v.client||'Client sans nom')+'</h2><p>'+(info||'Aucune info véhicule')+(v.tel?'<br><a href="tel:'+esc(String(v.tel).replace(/[^\d+]/g,''))+'">'+esc(v.tel)+'</a>':'')+'</p>'+
+  needPhoto(v);
+  return '<header class="top" style="align-items:center"><a class="back" href="#">← Tous les véhicules</a><span class="st" id="st"></span></header>'+banner()+
+  '<section class="vh">'+
+  (v.thumb?'<button class="picb" data-a="view" aria-label="Voir la photo en grand"><img id="pic" class="pic" src="'+esc(bigSrc(v))+'" alt="Photo du véhicule"></button>'
+          :'<label class="addpic">'+CAM+'<span>Ajouter une photo du véhicule</span><input type="file" accept="image/*" id="phin" hidden></label>')+
+  '<div class="hint" id="ph"></div>'+
+  plateHtml(v.plaque,1)+'<h2>'+esc(v.client||'Client sans nom')+'</h2><p>'+(info||'Aucune info véhicule')+(v.tel?'<br><a href="tel:'+esc(String(v.tel).replace(/[^\d+]/g,''))+'">'+esc(v.tel)+'</a>':'')+'</p>'+
   '<div class="acts"><button class="btn" data-a="edit">Modifier</button>'+(p.length?'<button class="btn" data-a="msg">Message au client</button>':'')+'</div>'+
   (ui.msg&&p.length?'<div class="msg"><textarea id="msgt" aria-label="Message au client">'+esc(msgText(v))+'</textarea><div class="acts"><button class="btn primary" data-a="copy">Copier</button><button class="btn" data-a="msgclose">Fermer</button></div><div class="hint" id="cph"></div></div>':'')+'</section>'+
   '<section class="box"><h3>Ajouter à prévoir</h3><div class="presets">'+PRESETS.map(t=>'<button class="chip" data-a="pre" data-t="'+esc(t)+'">'+esc(t)+'</button>').join('')+'</div>'+
@@ -191,6 +321,9 @@ function detail(v){
   '<section class="box"><h3>À prévoir ('+p.length+')</h3>'+(p.length?'<ul class="items">'+p.map(itemHtml).join('')+'</ul>':'<p class="meta">Rien à prévoir pour ce véhicule.</p>')+'</section>'+
   (d.length?'<details><summary>Déjà fait ('+d.length+')</summary><ul class="items">'+d.map(itemHtml).join('')+'</ul></details>':'')+
   '<div style="margin-top:30px"><button class="btn danger" data-a="delv">Supprimer ce véhicule</button></div>';
+}
+function viewerHtml(v){
+  return '<div class="viewer" data-a="closebg" role="dialog" aria-label="Photo du véhicule"><img src="'+esc(bigSrc(v))+'" alt="Photo du véhicule"><div class="vbar"><label class="btn">Changer la photo<input type="file" accept="image/*" id="phin" hidden></label><button class="btn danger" data-a="delphoto">Retirer</button><button class="btn primary" data-a="close">Fermer</button></div></div>';
 }
 function formHtml(){
   const v=ui.form;
@@ -202,19 +335,61 @@ function formHtml(){
   '<div class="hint" id="fh"></div><div class="end"><button class="btn" data-a="close">Annuler</button><button class="btn primary" data-a="savev">Enregistrer</button></div></div></div>';
 }
 function confirmHtml(){
-  return '<div class="sheet" data-a="closebg"><div role="dialog" aria-label="Confirmer"><h3>Supprimer ce véhicule ?</h3><p>Toutes ses notes seront effacées.</p><div class="end"><button class="btn" data-a="close">Annuler</button><button class="btn danger" data-a="delok">Supprimer</button></div></div></div>';
+  const ph=ui.confirm==='photo';
+  return '<div class="sheet" data-a="closebg"><div role="dialog" aria-label="Confirmer"><h3>'+(ph?'Retirer la photo ?':'Supprimer ce véhicule ?')+'</h3><p>'+(ph?'La photo de ce véhicule sera effacée.':'Toutes ses notes seront effacées.')+'</p><div class="end"><button class="btn" data-a="close">Annuler</button><button class="btn danger" data-a="'+(ph?'delphotook':'delok')+'">'+(ph?'Retirer':'Supprimer')+'</button></div></div></div>';
+}
+function loginHtml(){
+  return '<header class="top"><div><h1>Carnet atelier</h1><p class="sub">Carnet partagé de l’atelier</p></div></header>'+
+  '<div class="login"><h3>Connexion</h3><div class="f"><label for="le">Email</label><input id="le" type="email" autocomplete="username" inputmode="email" autocapitalize="off" autocorrect="off" spellcheck="false"></div>'+
+  '<div class="f"><label for="lp">Mot de passe</label><input id="lp" type="password" autocomplete="current-password"></div>'+
+  '<button class="btn primary" style="width:100%" data-a="login">Se connecter</button><div class="hint" id="lh"></div>'+
+  '<button class="linkb" data-a="reset">Mot de passe oublié ?</button></div>';
 }
 function render(){
-  const v=cur();
-  root.innerHTML='<div class="wrap">'+(v?detail(v):list())+'</div>'+(ui.form?formHtml():'')+(ui.confirm?confirmHtml():'');
-  if(!v)renderRes();
+  pendingRender=false;
+  let h,isList=false;const v=CLOUD&&!user?null:cur();
+  if(CLOUD&&loadErr)h='<header class="top"><div><h1>Carnet atelier</h1></div></header><p class="empty">'+esc(loadErr)+'</p><button class="btn primary" style="width:100%" data-a="reload">Réessayer</button>';
+  else if(CLOUD&&user===undefined)h='<header class="top"><div><h1>Carnet atelier</h1></div></header><p class="empty">Chargement…</p>';
+  else if(CLOUD&&!user)h=loginHtml();
+  else if(v)h=detail(v);
+  else{h=list();isList=true}
+  root.innerHTML='<div class="wrap">'+h+'</div>'+(ui.form&&(!CLOUD||user)?formHtml():'')+(ui.confirm&&v?confirmHtml():'')+(ui.viewer&&v&&v.thumb?viewerHtml(v):'');
+  if(isList)renderRes();
   setStatus();
   if(ui.form&&!ui.form.id){const f=document.getElementById(ui.form.plaque?'f-client':'f-plaque');if(f)f.focus()}
 }
+// Une modif arrive de l'autre téléphone : on n'efface pas ce que tu es en train de taper
+function busy(){const a=document.activeElement;return !!(ui.form||ui.confirm||ui.viewer||(a&&root.contains(a)&&(a.tagName==='TEXTAREA'||(a.tagName==='INPUT'&&a.type!=='file'))))}
+function softRender(){
+  const a=document.activeElement;
+  if(!cur()&&a&&a.id==='q'&&!ui.form){renderRes();setStatus();pendingRender=true;return}
+  if(busy()){pendingRender=true;setStatus();return}
+  render();
+}
+root.addEventListener('focusout',()=>setTimeout(()=>{if(pendingRender&&!busy())render()},0));
+
+/* ---------- Actions ---------- */
 root.addEventListener('click',e=>{
   const b=e.target.closest('[data-a]');if(!b)return;
   const a=b.dataset.a,v=cur();
-  if(a==='closebg'){if(e.target===b){ui.form=null;ui.confirm=null;render()}return}
+  if(a==='closebg'){if(e.target===b){ui.form=null;ui.confirm=null;ui.viewer=null;render()}return}
+  if(a==='reload'){location.reload();return}
+  if(a==='login'){
+    const em=document.getElementById('le').value.trim(),pw=document.getElementById('lp').value;
+    if(!em||!pw){hint('lh','Mets ton email et ton mot de passe.');return}
+    b.disabled=true;hint('lh','Connexion…');
+    fb.Au.signInWithEmailAndPassword(fb.auth,em,pw).catch(err=>{b.disabled=false;hint('lh',authMsg(err))});
+    return;
+  }
+  if(a==='reset'){
+    const em=document.getElementById('le').value.trim();
+    if(!em){hint('lh','Écris d’abord ton email, puis appuie ici.');return}
+    fb.Au.sendPasswordResetEmail(fb.auth,em).then(()=>hint('lh','Email envoyé : regarde ta boîte mail (et les spams).')).catch(err=>hint('lh',authMsg(err)));
+    return;
+  }
+  if(a==='logout'){location.hash='';fb.Au.signOut(fb.auth);return}
+  if(a==='migrate'){migrate();return}
+  if(a==='skipmig'){markMigrated();return}
   if(a==='mic'){
     if(!dict)return;
     try{if(listening)dict.stop();else dict.start()}catch(err){hint('dh','Dictée indisponible.')}
@@ -224,23 +399,26 @@ root.addEventListener('click',e=>{
   if(a==='filt'){ui.f=b.dataset.k;render();return}
   if(a==='new'){ui.form={};render();return}
   if(a==='newq'){const q=ui.q.trim();ui.form=/\d/.test(q)?{plaque:normPlate(q)}:{client:q};render();return}
-  if(a==='close'){ui.form=null;ui.confirm=null;render();return}
+  if(a==='close'){ui.form=null;ui.confirm=null;ui.viewer=null;render();return}
   if(a==='cleardemo'){S.v=[];S.demo=false;render();save();return}
   if(a==='savev'){
     const g=k=>document.getElementById('f-'+k).value.trim();
     const data={plaque:normPlate(g('plaque')),client:g('client'),tel:g('tel'),km:g('km').replace(/\D/g,''),modele:g('modele')};
     if(!data.plaque&&!data.client){hint('fh','Mets au moins une plaque ou un nom.');return}
-    let id=ui.form.id;
-    if(id){Object.assign(S.v.find(x=>x.id===id)||{},data,{up:today()})}
-    else{id=uid();S.v.push(Object.assign({id,items:[],up:today()},data))}
+    let id=ui.form.id,veh;
+    if(id){veh=S.v.find(x=>x.id===id);if(veh)Object.assign(veh,data,{up:today()})}
+    else{id=uid();veh=Object.assign({id,items:[],up:today()},data);S.v.push(veh)}
     ui.form=null;ui.q='';ss('q','');
     if(location.hash!=='#v-'+id)location.hash='v-'+id;
-    render();save();return;
+    render();if(veh)saveV(veh);return;
   }
   if(!v)return;
   if(a==='edit'){ui.form=Object.assign({},v);render();return}
-  if(a==='delv'){ui.confirm=1;render();return}
-  if(a==='delok'){S.v=S.v.filter(x=>x!==v);ui.confirm=null;location.hash='';render();save();return}
+  if(a==='view'){ui.viewer=1;render();return}
+  if(a==='delphoto'){ui.viewer=null;ui.confirm='photo';render();return}
+  if(a==='delphotook'){photoDel(v.id).catch(fail);delete photos[v.id];delete v.thumb;v.up=today();ui.confirm=null;render();saveV(v);return}
+  if(a==='delv'){ui.confirm='veh';render();return}
+  if(a==='delok'){S.v=S.v.filter(x=>x!==v);ui.confirm=null;location.hash='';render();dropV(v);return}
   if(a==='msg'){ui.msg=1;render();return}
   if(a==='msgclose'){ui.msg=null;render();return}
   if(a==='copy'){
@@ -253,14 +431,18 @@ root.addEventListener('click',e=>{
   if(a==='additem'){
     const it=document.getElementById('it'),t=it.value.trim();
     if(!t){hint('dh','Écris une note ou choisis un raccourci.');it.focus();return}
-    v.items.push({id:uid(),t,u:ui.u,d:today(),done:false});v.up=today();
-    ui.draft='';ss('draft','');render();save();return;
+    const n={id:uid(),t,u:ui.u,d:today(),done:false};if(me())n.par=me();
+    v.items.push(n);v.up=today();
+    ui.draft='';ss('draft','');render();saveV(v);return;
   }
   const i=v.items.find(x=>x.id===b.dataset.i);
-  if(a==='tog'&&i){i.done=!i.done;i.dd=i.done?today():null;v.up=today();render();save();return}
-  if(a==='deli'&&i){v.items=v.items.filter(x=>x!==i);render();save();return}
+  if(a==='tog'&&i){i.done=!i.done;i.dd=i.done?today():null;if(CLOUD)i.fp=i.done?me():null;v.up=today();render();saveV(v);return}
+  if(a==='deli'&&i){v.items=v.items.filter(x=>x!==i);render();saveV(v);return}
 });
-root.addEventListener('change',e=>{if(e.target.id==='imp'&&e.target.files[0])importData(e.target.files[0])});
+root.addEventListener('change',e=>{
+  if(e.target.id==='imp'&&e.target.files[0])importData(e.target.files[0]);
+  if(e.target.id==='phin'&&e.target.files[0]){const v=cur(),f=e.target.files[0];if(!v)return;ui.viewer=null;render();setPhoto(v,f)}
+});
 root.addEventListener('input',e=>{
   if(e.target.id==='q'){ui.q=e.target.value;ss('q',ui.q);renderRes()}
   if(e.target.id==='it'){ui.draft=e.target.value;ss('draft',ui.draft)}
@@ -268,9 +450,12 @@ root.addEventListener('input',e=>{
 root.addEventListener('keydown',e=>{
   if(e.key!=='Enter')return;
   if(e.target.id==='it'){e.preventDefault();const b=root.querySelector('[data-a=additem]');if(b)b.click()}
+  else if(e.target.id==='le'){e.preventDefault();document.getElementById('lp').focus()}
+  else if(e.target.id==='lp'){e.preventDefault();const b=root.querySelector('[data-a=login]');if(b)b.click()}
   else if(e.target.id&&e.target.id.indexOf('f-')===0){e.preventDefault();const b=root.querySelector('[data-a=savev]');if(b)b.click()}
 });
-addEventListener('hashchange',()=>{ui.form=null;ui.confirm=null;ui.msg=null;render();scrollTo(0,0)});
+addEventListener('hashchange',()=>{ui.form=null;ui.confirm=null;ui.msg=null;ui.viewer=null;render();scrollTo(0,0)});
 render();
+if(CLOUD)initCloud();
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
 }</script></body></html>
