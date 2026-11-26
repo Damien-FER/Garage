@@ -269,7 +269,7 @@ function banner(){
   return h;
 }
 function list(){
-  return '<header class="top"><div class="brand">'+LOGO+'<div><h1>GARAGE DU 16ème</h1><p class="sub">Ce qu’il faut prévoir au prochain passage</p></div></div><span class="st" id="st"></span></header>'+banner()+
+  return '<header class="top"><div class="brand">'+LOGO+'<div><h1>GARAGE DU 16ème</h1></div></div><span class="st" id="st"></span></header>'+banner()+
   '<div class="search"><input id="q" type="search" autocomplete="off" placeholder="Plaque, nom ou modèle" aria-label="Rechercher" value="'+esc(ui.q)+'"></div>'+
   '<div class="sum" id="sum"></div>'+
   '<div class="chips" id="chips">'+[['prevoir','À prévoir'],['urgent','Urgent'],['tous','Tous']].map(x=>'<button class="chip'+(ui.f===x[0]?' on':'')+'" data-a="filt" data-k="'+x[0]+'">'+x[1]+'</button>').join('')+'</div>'+
